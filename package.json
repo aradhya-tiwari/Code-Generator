@@ -1,0 +1,16 @@
+{
+  "name": "zigme-codegen",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "client",
+    "backend",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
