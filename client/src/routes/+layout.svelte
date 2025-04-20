@@ -1,7 +1,9 @@
 <script lang="ts">
-	import '../app.css';
-	
+	import "../app.css";
+
 	let { children } = $props();
 </script>
 
-{@render children()}
+<div class="bg-[#333]">
+	{@render children()}
+</div>
