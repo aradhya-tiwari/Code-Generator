@@ -10,15 +10,18 @@ const handler = createFactory().createHandlers(async (c) => {
 
     // const body = c.req.parseBody()
     const messages = []
+    let reqBody = await c.req.formData()
+    let prompt = reqBody.get("prompt")
     const google = createGoogleGenerativeAI({
         apiKey: process.env.GOOGLE_GENERATIVEAI_API_KEY
     })
 
     let resp = streamObject({
         model: google("gemini-2.0-flash-exp"),
+        temperature: 0.5,
         // experimental_output: Output.object({
         schema: z.object({
-            code: (z.string().describe("only code and comments of the prompt in markdown format nothing else.")),
+            code: (z.string().describe("only code and comments of the prompt nothing else.")),
             description: z.string().describe("description of the code")
         }),
         // }),
@@ -26,7 +29,7 @@ const handler = createFactory().createHandlers(async (c) => {
             role: "system",
             content: "You are a svelte 5 and shadcn-svelte component creator agent, dont use any other stack strictly adhere to this. Give response in structured output"
         },
-        { role: "user", content: "Create a calendar component" }
+        { role: "user", content: prompt + ".Create it in svelte5 and shadcn-svelte" }
         ],
 
     })

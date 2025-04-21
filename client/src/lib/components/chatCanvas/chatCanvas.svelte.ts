@@ -15,12 +15,26 @@ type chatContentType = AiContent | userInput
 
 let chatContent: chatContentType[] = $state([])
 let chatCount: number = $derived(chatContent.length)
-
-export async function addChat(obj: userInput) {
-    let currentIdx = getCurrentChat()
+chatContent.push({
+    sender: "ai",
+    code: "What Component to create Today ?",
+    description: "I will describe it as well as generate code for that"
+})
+export async function addChat(obj: userInput, prompt: string) {
     chatContent.push(obj)
-    let resp = await hhc.chat.$post({})
+    let resp = await hhc.chat.$post({
+        form: {
+            prompt: prompt
+        }
+    })
     let respReader = resp.body?.getReader()
+    let idx = getCurrentChat()
+    console.log(idx)
+    chatContent.push({
+        sender: "ai",
+        code: "",
+        description: ""
+    })
 
     const readChunks = async () => {
         let readerStream = await respReader?.read()
@@ -28,13 +42,18 @@ export async function addChat(obj: userInput) {
             console.log("Done Code Generation")
             return
         }
+
         let chunkString = new TextDecoder().decode(readerStream?.value)
-        console.log(JSON.parse(chunkString))
+        let jsonChunk = JSON.parse(chunkString)
+
+        if (chatContent[idx].sender === "ai" && chunkString) {
+            chatContent[idx].code = jsonChunk.code
+            chatContent[idx].description = jsonChunk.description
+
+        }
         readChunks()
     }
     readChunks()
-
-
 }
 export function getCurrentChat() {
     return chatCount
